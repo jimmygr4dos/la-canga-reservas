@@ -1,0 +1,454 @@
+/* Reset y base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  color: #131212;
+}
+
+.logo {
+  height: 60px;
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  padding: 10px 20px;
+  color: rgb(13, 1, 1);
+}
+
+header nav a {
+  margin: 0 10px;
+  color: rgb(8, 3, 3);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.reserva-btn {
+  background-color: #ff0000;
+  padding: 10px 15px;
+  border-radius: 5px;
+  color: #f7f1f1;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Banner */
+.banner {
+  width: 100%;
+  height: 300px;
+  background-position: center;
+  background-size: cover;
+}
+
+/* Secciones */
+section {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.seccion-imagenes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.item {
+  width: 200px;
+}
+
+.item img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* Footer */
+footer {
+  background-color: #222;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+footer ul {
+  list-style: none;
+}
+
+footer ul li {
+  margin: 5px 0;
+}
+
+/* Modales */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-contenido {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  text-align: left;
+}
+
+.cerrar-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  color: #888;
+  cursor: pointer;
+}
+
+.oculto {
+  display: none;
+}
+
+.campo {
+  margin-bottom: 20px;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.campo input, .campo select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Botones */
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #8B0000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #a00000;
+}
+
+/* Plano de mesas */
+.plano {
+  max-width: 700px;
+}
+
+.leyenda {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.plano-mesas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  justify-items: center;
+  margin: 20px 0;
+}
+
+/* Estilo mesas */
+.mesa {
+  width: 80px;
+  height: 80px;
+  background-color: #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  padding: 5px;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.mesa-disponible {
+  background-color: green;
+  color: white;
+}
+
+.mesa-ocupada {
+  background-color: red;
+  color: white;
+  cursor: not-allowed;
+}
+
+.mesa-seleccionada {
+  background-color: blue;
+  color: white;
+}
+
+/* Botón final de reserva */
+.boton-reservar-final {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background-color: #006400;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.boton-reservar-final:hover {
+  background-color: #840303;
+}
+
+/* Modal 4 - Reserva ya realizada */
+#modal-ya-reservado .modal-contenido {
+  text-align: center;
+  padding: 40px;
+}
+
+#modal-ya-reservado h2 {
+  color: #8B0000;
+  margin-bottom: 20px;
+}
+
+#modal-ya-reservado #codigo-reserva {
+  font-size: 1.8rem;
+  color: #000;
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+#modal-ya-reservado .acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#modal-ya-reservado button {
+  width: 100%;
+}
+
+/* Modal 5 - Cancelar reserva */
+#modal-eliminar-reserva .modal-contenido {
+  text-align: center;
+  padding: 40px;
+}
+
+#modal-eliminar-reserva h2 {
+  color: #8B0000;
+  margin-bottom: 15px;
+}
+
+#modal-eliminar-reserva input[type="number"] {
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+#modal-eliminar-reserva .acciones {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+#btn-eliminar-confirmar {
+  background-color: #c00000;
+}
+
+#btn-eliminar-confirmar:hover {
+  background-color: #a00000;
+}
+
+#btn-eliminar-cerrar {
+  background-color: #666;
+}
+
+#btn-eliminar-cerrar:hover {
+  background-color: #444;
+}
+
+/* ... Todo tu CSS anterior se mantiene ... */
+
+/* Agregado: animación para mostrar modales suavemente */
+.modal {
+  animation: aparecer 0.3s ease-in-out;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Nuevos estilos para mesas ocupadas (desde localStorage) */
+.mesa[data-ocupada="true"] {
+  background-color: red !important;
+  color: white;
+  cursor: not-allowed;
+}
+
+/* Resaltar el campo con borde rojo si el código no coincide */
+#codigo-eliminar.invalido {
+  border-color: red;
+  background-color: #ffe6e6;
+}
+
+/* Botón especial dentro del primer modal para eliminar reserva */
+#btn-cancelar-reserva {
+  background-color: #c00000;
+}
+
+#btn-cancelar-reserva:hover {
+  background-color: #a00000;
+}
+
+/* Botones confirmación modal 4 (nueva reserva y finalizar) */
+#btn-nueva-reserva {
+  background-color: #8B0000;
+}
+
+#btn-nueva-reserva:hover {
+  background-color: #a00000;
+}
+
+#btn-finalizar-modal {
+  background-color: #444;
+}
+
+#btn-finalizar-modal:hover {
+  background-color: #222;
+}
+
+.admin-dashboard {
+  padding: 40px;
+  text-align: center;
+}
+
+.estadisticas {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.card {
+  background-color: #fff8f0;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  width: 200px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card h3 {
+  color: #8B0000;
+  margin-bottom: 10px;
+}
+
+.acciones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.acciones button {
+  padding: 10px 20px;
+  background-color: #8B0000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.acciones button:hover {
+  background-color: #a00000;
+}
+
+.listado-reservas button {
+  background-color: #c00000;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.listado-reservas button:hover {
+  background-color: #a00000;
+}
+
+.listado-reservas table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.listado-reservas th, .listado-reservas td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.listado-reservas th {
+  background-color: #f4f4f4;
+}
+
+.listado-reservas button {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
