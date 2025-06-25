@@ -1,12 +1,30 @@
-# React + Vite
+# 🍽️ Sistema de Reservas – La Canga
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es una aplicación web desarrollada en React para gestionar las reservas del restaurante **La Canga**. Permite a los clientes seleccionar mesas interactivamente y a los administradores controlar todas las reservas y anulaciones.
 
-Currently, two official plugins are available:
+## 🚀 Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 📅 Reserva interactiva de mesas por fecha y hora
+- 💾 Almacenamiento en localStorage (sin backend)
+- 👤 Validación de duplicados por cliente
+- 🔐 Vista de administrador:
+  - Dashboard con métricas
+  - Listado de reservas activas
+  - Historial de reservas anuladas
+  - Formulario para anular o crear una reserva manual
 
-## Expanding the ESLint configuration
+## 🛠️ Tecnologías utilizadas
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React.js (Vite)
+- CSS personalizado
+- localStorage
+
+## 🧪 ¿Cómo ejecutar el proyecto?
+
+```bash
+# Instalar dependencias
+npm install
+
+# Iniciar servidor local
+npm run dev
+
