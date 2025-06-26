@@ -30,11 +30,11 @@ function App() {
     abrirModal('cliente');
   };
 
-  // Escucha de evento reservaExistente (en caso de duplicados)
   useEffect(() => {
     const detectarDuplicado = (e) => {
       e.preventDefault?.();
       e.stopPropagation?.();
+      localStorage.setItem('reservaFinal', JSON.stringify({ codigo: e.detail }));
       setTimeout(() => {
         setCodigoReserva(e.detail);
         setModalVisible('yaReservado');
@@ -56,7 +56,6 @@ function App() {
       <SectionLocales />
       <Footer />
 
-      {/* Modal 1: Datos del Cliente */}
       <ModalDatosCliente
         isOpen={modalVisible === 'cliente'}
         onClose={cerrarModal}
@@ -64,21 +63,18 @@ function App() {
         onCancelar={() => abrirModal('eliminar')}
       />
 
-      {/* Modal 2: Datos de Reserva */}
       <ModalDatosReserva
         isOpen={modalVisible === 'reserva'}
         onClose={cerrarModal}
         onSiguiente={() => abrirModal('mesas')}
       />
 
-      {/* Modal 3: Selección de Mesa */}
       <ModalSeleccionMesa
         isOpen={modalVisible === 'mesas'}
         onClose={cerrarModal}
         onReservaCompleta={handleReservaCompleta}
       />
 
-      {/* Modal 4: Ya Reservado */}
       <ModalYaReservado
         isOpen={modalVisible === 'yaReservado'}
         onClose={cerrarModal}
@@ -86,7 +82,6 @@ function App() {
         onNuevaReserva={iniciarNuevaReserva}
       />
 
-      {/* Modal 5: Eliminar Reserva */}
       <ModalEliminarReserva
         isOpen={modalVisible === 'eliminar'}
         onClose={cerrarModal}
@@ -96,10 +91,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-

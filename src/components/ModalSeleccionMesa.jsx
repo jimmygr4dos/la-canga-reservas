@@ -40,6 +40,7 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
     );
 
     if (yaExiste) {
+      localStorage.setItem('reservaFinal', JSON.stringify(yaExiste)); // Clave que el modal lee
       const evento = new CustomEvent('reservaExistente', {
         detail: yaExiste.codigo,
       });
@@ -62,6 +63,7 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
     const nuevasReservas = [...reservas, nuevaReserva];
     localStorage.setItem('reservas', JSON.stringify(nuevasReservas));
     localStorage.setItem('reservaActiva', JSON.stringify(nuevaReserva));
+    localStorage.setItem('reservaFinal', JSON.stringify(nuevaReserva)); // Para que aparezca en ModalYaReservado
 
     onReservaCompleta(nuevoCodigo);
   };
@@ -117,6 +119,7 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
 };
 
 export default ModalSeleccionMesa;
+
 
 
 

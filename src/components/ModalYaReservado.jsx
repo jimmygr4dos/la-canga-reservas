@@ -1,9 +1,7 @@
 import React from 'react';
 
-function ModalYaReservado({ isOpen, onClose, onNuevaReserva }) {
-  const reserva = JSON.parse(localStorage.getItem('reservaFinal')) || null;
-
-  if (!isOpen || !reserva) return null;
+function ModalYaReservado({ isOpen, onClose, onNuevaReserva, codigo }) {
+  if (!isOpen || !codigo) return null;
 
   return (
     <div className="modal">
@@ -13,7 +11,7 @@ function ModalYaReservado({ isOpen, onClose, onNuevaReserva }) {
         <p style={{ margin: '1rem 0' }}>Tu código de reserva es:</p>
         <p>
           <strong id="codigo-reserva" style={{ fontSize: '1.8rem', color: '#006400' }}>
-            #{reserva.codigo}
+            #{codigo}
           </strong>
         </p>
 
@@ -31,3 +29,4 @@ function ModalYaReservado({ isOpen, onClose, onNuevaReserva }) {
 }
 
 export default ModalYaReservado;
+

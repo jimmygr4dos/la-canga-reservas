@@ -20,7 +20,6 @@ const ListadoReservas = () => {
     const reservaAnular = todas.find((r) => r.codigo === codigo);
     if (!reservaAnular) return;
 
-    // Asegurar que todos los campos existan
     const reservaCompleta = {
       nombre: reservaAnular.nombre || '-',
       correo: reservaAnular.correo || '-',
@@ -31,7 +30,6 @@ const ListadoReservas = () => {
       codigo: reservaAnular.codigo
     };
 
-    // Actualizar localStorage
     const nuevasReservas = todas.filter((r) => r.codigo !== codigo);
     localStorage.setItem('reservas', JSON.stringify(nuevasReservas));
     localStorage.setItem('reservasAnuladas', JSON.stringify([...anuladas, reservaCompleta]));

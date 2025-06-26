@@ -19,7 +19,6 @@ const CrearReservaAdmin = () => {
     e.preventDefault();
     const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
 
-    // Verificar duplicado por nombre + fecha + hora
     const yaExiste = reservas.find(
       (r) =>
         r.nombre.toLowerCase() === reserva.nombre.toLowerCase() &&
@@ -32,7 +31,7 @@ const CrearReservaAdmin = () => {
       return;
     }
 
-    // Verificar si la mesa está ocupada para esa fecha y hora
+    
     const mesaOcupada = reservas.find(
       (r) => r.mesa === reserva.mesa && r.fecha === reserva.fecha && r.hora === reserva.hora
     );

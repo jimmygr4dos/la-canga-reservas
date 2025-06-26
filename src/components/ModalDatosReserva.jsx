@@ -24,7 +24,6 @@ function ModalDatosReserva({ isOpen, onClose, onSiguiente }) {
     const nombreCliente = datosCliente.nombre.toLowerCase();
     const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
 
-    // Validar duplicado por nombre + fecha + hora
     const duplicado = reservas.find(
       (r) =>
         r.nombre?.toLowerCase() === nombreCliente &&
@@ -41,7 +40,6 @@ function ModalDatosReserva({ isOpen, onClose, onSiguiente }) {
       return;
     }
 
-    // Guardar datos temporales combinando cliente + reserva
     const datosCompletos = { ...datosCliente, ...reserva };
     localStorage.setItem('reservaTemporal', JSON.stringify(datosCompletos));
     onSiguiente();

@@ -26,15 +26,14 @@ function ModalDatosCliente({ isOpen, onClose, onSiguiente, onCancelar }) {
     );
 
     if (duplicado) {
+      localStorage.setItem('reservaFinal', JSON.stringify(duplicado)); // clave para ModalYaReservado
       const evento = new CustomEvent('reservaExistente', {
         detail: duplicado.codigo,
       });
       window.dispatchEvent(evento);
-      // No llamamos a onClose() aquí para evitar cerrar el modal inmediatamente
       return;
     }
 
-    // Guardar datos si no hay duplicado
     localStorage.setItem('datosCliente', JSON.stringify(datos));
     onSiguiente();
   };
@@ -70,4 +69,5 @@ function ModalDatosCliente({ isOpen, onClose, onSiguiente, onCancelar }) {
 }
 
 export default ModalDatosCliente;
+
 
