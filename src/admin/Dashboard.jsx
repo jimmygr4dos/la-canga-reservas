@@ -2,23 +2,41 @@ import React, { useEffect, useState } from 'react';
 import '../styles/estilos.css';
 
 const Dashboard = () => {
+  const [logueado, setLogueado] = useState(false);
+  const [usuario, setUsuario] = useState('');
+  const [clave, setClave] = useState('');
+  const [error, setError] = useState('');
+
   const [reservasTotales, setReservasTotales] = useState(0);
   const [reservasAnuladas, setReservasAnuladas] = useState(0);
   const [mesasOcupadas, setMesasOcupadas] = useState(0);
   const [mesasDisponibles, setMesasDisponibles] = useState(0);
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // Usuario y contraseña fijos
+    if (usuario === 'admin' && clave === '1234') {
+      setLogueado(true);
+      setError('');
+    } else {
+      setError('Credenciales incorrectas');
+    }
+  };
+
   useEffect(() => {
-    const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
-    const anuladas = JSON.parse(localStorage.getItem('reservasAnuladas')) || [];
+    if (logueado) {
+      const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
+      const anuladas = JSON.parse(localStorage.getItem('reservasAnuladas')) || [];
 
-    setReservasTotales(reservas.length);
-    setReservasAnuladas(anuladas.length);
+      setReservasTotales(reservas.length);
+      setReservasAnuladas(anuladas.length);
 
-    const ocupadas = reservas.map(r => r.mesa);
-    const totalMesas = 16; // ejemplo fijo para total de mesas
-    setMesasOcupadas(ocupadas.length);
-    setMesasDisponibles(totalMesas - ocupadas.length);
-  }, []);
+      const ocupadas = reservas.map(r => r.mesa);
+      const totalMesas = 16;
+      setMesasOcupadas(ocupadas.length);
+      setMesasDisponibles(totalMesas - ocupadas.length);
+    }
+  }, [logueado]);
 
   const limpiarReservas = () => {
     if (window.confirm('¿Estás seguro de eliminar todas las reservas?')) {
@@ -33,6 +51,28 @@ const Dashboard = () => {
       window.location.reload();
     }
   };
+
+  if (!logueado) {
+    return (
+      <div className="modal">
+        <div className="modal-contenido" style={{ maxWidth: '400px', margin: 'auto' }}>
+          <h2>Login Administrador</h2>
+          <form onSubmit={handleLogin}>
+            <div className="campo">
+              <label>Usuario:</label>
+              <input type="text" value={usuario} onChange={(e) => setUsuario(e.target.value)} required />
+            </div>
+            <div className="campo">
+              <label>Contraseña:</label>
+              <input type="password" value={clave} onChange={(e) => setClave(e.target.value)} required />
+            </div>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <button type="submit">Ingresar</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">
@@ -65,3 +105,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

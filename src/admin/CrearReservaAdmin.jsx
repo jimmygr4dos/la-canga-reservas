@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/estilos.css';
+import ModalYaReservado from '../components/ModalYaReservado';
 
 const CrearReservaAdmin = () => {
   const [reserva, setReserva] = useState({
@@ -10,6 +11,9 @@ const CrearReservaAdmin = () => {
     hora: '',
     mesa: '',
   });
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [codigoReserva, setCodigoReserva] = useState('');
 
   const handleChange = (e) => {
     setReserva({ ...reserva, [e.target.name]: e.target.value });
@@ -31,7 +35,6 @@ const CrearReservaAdmin = () => {
       return;
     }
 
-    
     const mesaOcupada = reservas.find(
       (r) => r.mesa === reserva.mesa && r.fecha === reserva.fecha && r.hora === reserva.hora
     );
@@ -45,8 +48,13 @@ const CrearReservaAdmin = () => {
     const nuevaReserva = { ...reserva, codigo: nuevoCodigo };
 
     localStorage.setItem('reservas', JSON.stringify([...reservas, nuevaReserva]));
-    alert(`Reserva creada con código: ${nuevoCodigo}`);
+    localStorage.setItem('reservaFinal', JSON.stringify({ codigo: nuevoCodigo }));
 
+    setCodigoReserva(nuevoCodigo);
+    setModalVisible(true);
+  };
+
+  const iniciarNuevaReserva = () => {
     setReserva({
       nombre: '',
       correo: '',
@@ -55,6 +63,8 @@ const CrearReservaAdmin = () => {
       hora: '',
       mesa: '',
     });
+    setCodigoReserva('');
+    setModalVisible(false);
   };
 
   return (
@@ -92,9 +102,17 @@ const CrearReservaAdmin = () => {
         </div>
         <button type="submit">Crear Reserva</button>
       </form>
+
+      <ModalYaReservado
+        isOpen={modalVisible}
+        onClose={() => setModalVisible(false)}
+        codigo={codigoReserva}
+        onNuevaReserva={iniciarNuevaReserva}
+      />
     </div>
   );
 };
 
 export default CrearReservaAdmin;
+
 
