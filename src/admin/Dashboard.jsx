@@ -1,27 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { useUser } from '../UserContext';
 import '../styles/estilos.css';
 
 const Dashboard = () => {
-  const [logueado, setLogueado] = useState(false);
-  const [usuario, setUsuario] = useState('');
-  const [clave, setClave] = useState('');
-  const [error, setError] = useState('');
+  const { logueado } = useUser();
 
   const [reservasTotales, setReservasTotales] = useState(0);
   const [reservasAnuladas, setReservasAnuladas] = useState(0);
   const [mesasOcupadas, setMesasOcupadas] = useState(0);
   const [mesasDisponibles, setMesasDisponibles] = useState(0);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Usuario y contraseña fijos
-    if (usuario === 'admin' && clave === '1234') {
-      setLogueado(true);
-      setError('');
-    } else {
-      setError('Credenciales incorrectas');
-    }
-  };
 
   useEffect(() => {
     if (logueado) {
@@ -31,10 +18,9 @@ const Dashboard = () => {
       setReservasTotales(reservas.length);
       setReservasAnuladas(anuladas.length);
 
-      const ocupadas = reservas.map(r => r.mesa);
       const totalMesas = 16;
-      setMesasOcupadas(ocupadas.length);
-      setMesasDisponibles(totalMesas - ocupadas.length);
+      setMesasOcupadas(reservas.length);
+      setMesasDisponibles(totalMesas - reservas.length);
     }
   }, [logueado]);
 
@@ -53,25 +39,7 @@ const Dashboard = () => {
   };
 
   if (!logueado) {
-    return (
-      <div className="modal">
-        <div className="modal-contenido" style={{ maxWidth: '400px', margin: 'auto' }}>
-          <h2>Login Administrador</h2>
-          <form onSubmit={handleLogin}>
-            <div className="campo">
-              <label>Usuario:</label>
-              <input type="text" value={usuario} onChange={(e) => setUsuario(e.target.value)} required />
-            </div>
-            <div className="campo">
-              <label>Contraseña:</label>
-              <input type="password" value={clave} onChange={(e) => setClave(e.target.value)} required />
-            </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <button type="submit">Ingresar</button>
-          </form>
-        </div>
-      </div>
-    );
+    return <p style={{ textAlign: 'center', marginTop: '50px' }}>Acceso denegado. Inicia sesión como administrador.</p>;
   }
 
   return (
@@ -105,4 +73,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
 
