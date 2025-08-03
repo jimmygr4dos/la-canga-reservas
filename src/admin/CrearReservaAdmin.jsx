@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import '../styles/estilos.css';
 import ModalYaReservado from '../components/ModalYaReservado';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig'; // ✅ Correcto
+
 
 const CrearReservaAdmin = () => {
   const [reserva, setReserva] = useState({
@@ -19,39 +22,48 @@ const CrearReservaAdmin = () => {
     setReserva({ ...reserva, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const reservas = JSON.parse(localStorage.getItem('reservas')) || [];
 
-    const yaExiste = reservas.find(
-      (r) =>
-        r.nombre.toLowerCase() === reserva.nombre.toLowerCase() &&
-        r.fecha === reserva.fecha &&
-        r.hora === reserva.hora
-    );
+    try {
+      const snapshot = await getDocs(collection(db, 'reservas'));
+      const reservasExistentes = snapshot.docs.map((doc) => doc.data());
 
-    if (yaExiste) {
-      alert(`Ya existe una reserva para ${reserva.nombre} en esa fecha y hora.`);
-      return;
+      const yaExiste = reservasExistentes.find(
+        (r) =>
+          r.nombre.toLowerCase() === reserva.nombre.toLowerCase() &&
+          r.fecha === reserva.fecha &&
+          r.hora === reserva.hora
+      );
+
+      if (yaExiste) {
+        alert(`Ya existe una reserva para ${reserva.nombre} en esa fecha y hora.`);
+        return;
+      }
+
+      const mesaOcupada = reservasExistentes.find(
+        (r) => r.mesa === reserva.mesa && r.fecha === reserva.fecha && r.hora === reserva.hora
+      );
+
+      if (mesaOcupada) {
+        alert(`La ${reserva.mesa} ya está reservada en esa fecha y hora.`);
+        return;
+      }
+
+      const nuevoCodigo = `R-${Math.floor(100000 + Math.random() * 900000)}`;
+      const nuevaReserva = {
+        ...reserva,
+        codigo: nuevoCodigo,
+        estado: 'activa',
+      };
+
+      await addDoc(collection(db, 'reservas'), nuevaReserva);
+      setCodigoReserva(nuevoCodigo);
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Error al crear reserva:', error);
+      alert('Hubo un error al registrar la reserva.');
     }
-
-    const mesaOcupada = reservas.find(
-      (r) => r.mesa === reserva.mesa && r.fecha === reserva.fecha && r.hora === reserva.hora
-    );
-
-    if (mesaOcupada) {
-      alert(`La ${reserva.mesa} ya está reservada en esa fecha y hora.`);
-      return;
-    }
-
-    const nuevoCodigo = `R-${Math.floor(100000 + Math.random() * 900000)}`;
-    const nuevaReserva = { ...reserva, codigo: nuevoCodigo };
-
-    localStorage.setItem('reservas', JSON.stringify([...reservas, nuevaReserva]));
-    localStorage.setItem('reservaFinal', JSON.stringify({ codigo: nuevoCodigo }));
-
-    setCodigoReserva(nuevoCodigo);
-    setModalVisible(true);
   };
 
   const iniciarNuevaReserva = () => {
@@ -114,5 +126,6 @@ const CrearReservaAdmin = () => {
 };
 
 export default CrearReservaAdmin;
+
 
 

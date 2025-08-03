@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase/firebaseConfig'; // Asegúrate de tener este archivo configurado
+import { collection, addDoc } from 'firebase/firestore';
 
 const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
   const [mesaSeleccionada, setMesaSeleccionada] = useState(null);
@@ -24,6 +26,16 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
     return `R-${random}`;
   };
 
+  // ✅ NUEVA FUNCIÓN PARA GUARDAR EN FIRESTORE
+  const guardarReserva = async (reserva) => {
+    try {
+      await addDoc(collection(db, 'reservas'), reserva);
+      console.log('Reserva guardada en Firebase');
+    } catch (error) {
+      console.error('Error al guardar en Firebase:', error);
+    }
+  };
+
   const confirmarReserva = () => {
     if (!mesaSeleccionada) {
       alert('Por favor, selecciona una mesa.');
@@ -40,7 +52,7 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
     );
 
     if (yaExiste) {
-      localStorage.setItem('reservaFinal', JSON.stringify(yaExiste)); // Clave que el modal lee
+      localStorage.setItem('reservaFinal', JSON.stringify(yaExiste));
       const evento = new CustomEvent('reservaExistente', {
         detail: yaExiste.codigo,
       });
@@ -63,7 +75,9 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
     const nuevasReservas = [...reservas, nuevaReserva];
     localStorage.setItem('reservas', JSON.stringify(nuevasReservas));
     localStorage.setItem('reservaActiva', JSON.stringify(nuevaReserva));
-    localStorage.setItem('reservaFinal', JSON.stringify(nuevaReserva)); // Para que aparezca en ModalYaReservado
+    localStorage.setItem('reservaFinal', JSON.stringify(nuevaReserva));
+
+    guardarReserva(nuevaReserva); // 🔥 Se guarda en Firebase
 
     onReservaCompleta(nuevoCodigo);
   };
@@ -119,6 +133,7 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
 };
 
 export default ModalSeleccionMesa;
+
 
 
 
