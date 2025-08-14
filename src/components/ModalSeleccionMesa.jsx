@@ -1,94 +1,165 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../firebase/firebaseConfig'; // Asegúrate de tener este archivo configurado
-import { collection, addDoc } from 'firebase/firestore';
+import React, { useState, useEffect, useCallback } from 'react';
+import { db } from '../firebase/firebaseConfig';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
 
 const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
   const [mesaSeleccionada, setMesaSeleccionada] = useState(null);
-  const [reservas, setReservas] = useState([]);
+  const [mesasOcupadas, setMesasOcupadas] = useState([]); // ocupadas en Firestore para fecha/hora
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
-  const [nombre, setNombre] = useState('');
+  const [guardando, setGuardando] = useState(false);
 
+  // Carga datos del paso anterior y mesas ocupadas del slot
   useEffect(() => {
-    if (isOpen) {
-      const data = JSON.parse(localStorage.getItem('reservaTemporal')) || {};
-      const reservasGuardadas = JSON.parse(localStorage.getItem('reservas')) || [];
+    if (!isOpen) return;
 
-      setFecha(data.fecha || '');
-      setHora(data.hora || '');
-      setNombre(data.nombre || '');
-      setReservas(reservasGuardadas);
-    }
+    const data = JSON.parse(localStorage.getItem('reservaTemporal')) || {};
+    setFecha(data.fecha || '');
+    setHora(data.hora || '');
+
+    // Cargar ocupación de Firestore para la fecha/hora elegida
+    const cargarOcupadas = async () => {
+      try {
+        if (!data.fecha || !data.hora) return;
+        const q = query(
+          collection(db, 'reservas'),
+          where('fecha', '==', data.fecha),
+          where('hora', '==', data.hora),
+          where('estado', '!=', 'anulada') // si usas estado
+        );
+        const snap = await getDocs(q);
+        const ocupadas = snap.docs.map(d => d.data().mesa);
+        setMesasOcupadas(ocupadas);
+      } catch (err) {
+        console.error('Error cargando mesas ocupadas:', err);
+      }
+    };
+
+    cargarOcupadas();
+    setMesaSeleccionada(null);
   }, [isOpen]);
 
-  const generarCodigo = () => {
-    const random = Math.floor(100000 + Math.random() * 900000);
-    return `R-${random}`;
-  };
+  const generarCodigo = () =>
+    `R-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // ✅ NUEVA FUNCIÓN PARA GUARDAR EN FIRESTORE
-  const guardarReserva = async (reserva) => {
-    try {
-      await addDoc(collection(db, 'reservas'), reserva);
-      console.log('Reserva guardada en Firebase');
-    } catch (error) {
-      console.error('Error al guardar en Firebase:', error);
-    }
-  };
+  // Chequea si existe el mismo cliente en el mismo slot
+  const existeDuplicado = useCallback(async ({ nombre, fecha, hora }) => {
+    const q = query(
+      collection(db, 'reservas'),
+      where('fecha', '==', fecha),
+      where('hora', '==', hora),
+      where('nombreLower', '==', (nombre || '').trim().toLowerCase())
+    );
+    const snap = await getDocs(q);
+    return !snap.empty;
+  }, []);
 
-  const confirmarReserva = () => {
+  // Chequea si la mesa ya está ocupada para el slot
+  const mesaYaOcupada = useCallback(async ({ mesa, fecha, hora }) => {
+    const q = query(
+      collection(db, 'reservas'),
+      where('fecha', '==', fecha),
+      where('hora', '==', hora),
+      where('mesa', '==', mesa),
+      where('estado', '!=', 'anulada')
+    );
+    const snap = await getDocs(q);
+    return !snap.empty;
+  }, []);
+
+  const confirmarReserva = async () => {
     if (!mesaSeleccionada) {
       alert('Por favor, selecciona una mesa.');
       return;
     }
 
     const cliente = JSON.parse(localStorage.getItem('datosCliente')) || {};
+    const nombre = (cliente.nombre || '').trim();
+    const correo = (cliente.correo || '').trim();
+    const telefono = (cliente.telefono || '').trim();
 
-    const yaExiste = reservas.find(
-      (res) =>
-        res.nombre?.toLowerCase() === cliente.nombre?.toLowerCase() &&
-        res.fecha === fecha &&
-        res.hora === hora
-    );
-
-    if (yaExiste) {
-      localStorage.setItem('reservaFinal', JSON.stringify(yaExiste));
-      const evento = new CustomEvent('reservaExistente', {
-        detail: yaExiste.codigo,
-      });
-      window.dispatchEvent(evento);
-      onClose();
+    if (!fecha || !hora || !nombre) {
+      alert('Faltan datos de la reserva. Vuelve al paso anterior.');
       return;
     }
 
-    const nuevoCodigo = generarCodigo();
-    const nuevaReserva = {
-      codigo: nuevoCodigo,
-      nombre: cliente.nombre || '',
-      correo: cliente.correo || '',
-      telefono: cliente.telefono || '',
-      fecha,
-      hora,
-      mesa: mesaSeleccionada,
-    };
+    try {
+      setGuardando(true);
 
-    const nuevasReservas = [...reservas, nuevaReserva];
-    localStorage.setItem('reservas', JSON.stringify(nuevasReservas));
-    localStorage.setItem('reservaActiva', JSON.stringify(nuevaReserva));
-    localStorage.setItem('reservaFinal', JSON.stringify(nuevaReserva));
+      // Duplicado por cliente en mismo slot
+      const dup = await existeDuplicado({ nombre, fecha, hora });
+      if (dup) {
+        // dispara tu flujo existente para mostrar el modal de ya reservado
+        const reservasLocal = JSON.parse(localStorage.getItem('reservas')) || [];
+        const existente = reservasLocal.find(
+          (r) =>
+            (r.nombre || '').toLowerCase() === nombre.toLowerCase() &&
+            r.fecha === fecha &&
+            r.hora === hora
+        );
+        if (existente) {
+          localStorage.setItem('reservaFinal', JSON.stringify(existente));
+          const evento = new CustomEvent('reservaExistente', { detail: existente.codigo });
+          window.dispatchEvent(evento);
+        } else {
+          // si no está en local, igual avisamos con un código genérico
+          alert('Esta persona ya tiene una reserva en ese horario.');
+        }
+        onClose?.();
+        return;
+      }
 
-    guardarReserva(nuevaReserva); // 🔥 Se guarda en Firebase
+      // Colisión de mesa
+      const ocupada = await mesaYaOcupada({ mesa: mesaSeleccionada, fecha, hora });
+      if (ocupada) {
+        alert(`La ${mesaSeleccionada} ya está reservada en esa fecha y hora.`);
+        return;
+      }
 
-    onReservaCompleta(nuevoCodigo);
+      // Guardar
+      const codigo = generarCodigo();
+      const docData = {
+        codigo,
+        nombre,
+        correo,
+        telefono,
+        fecha,
+        hora,
+        mesa: mesaSeleccionada,
+        estado: 'activa',
+        // campos normalizados para consultas
+        nombreLower: nombre.toLowerCase(),
+        correoLower: correo.toLowerCase(),
+      };
+
+      await addDoc(collection(db, 'reservas'), docData);
+
+      // Mantener compatibilidad local (si tu flujo lo usa)
+      const reservasLocal = JSON.parse(localStorage.getItem('reservas')) || [];
+      localStorage.setItem('reservas', JSON.stringify([...reservasLocal, docData]));
+      localStorage.setItem('reservaActiva', JSON.stringify(docData));
+      localStorage.setItem('reservaFinal', JSON.stringify(docData));
+
+      // Notificar al contenedor para mostrar ModalYaReservado
+      onReservaCompleta?.(codigo);
+    } catch (err) {
+      console.error('Error al guardar la reserva:', err);
+      alert('Hubo un error al registrar la reserva.');
+    } finally {
+      setGuardando(false);
+    }
   };
 
   const mesas = Array.from({ length: 12 }, (_, i) => `Mesa ${i + 1}`);
 
-  const obtenerEstadoMesa = (mesa) => {
-    const ocupada = reservas.find(
-      (res) => res.fecha === fecha && res.hora === hora && res.mesa === mesa
-    );
-    if (ocupada) return 'mesa-ocupada';
+  const estadoMesa = (mesa) => {
+    if (mesasOcupadas.includes(mesa)) return 'mesa-ocupada';
     if (mesa === mesaSeleccionada) return 'mesa-seleccionada';
     return 'mesa-disponible';
   };
@@ -98,19 +169,19 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
   return (
     <div className="modal">
       <div className="modal-contenido">
-        <span className="cerrar-modal" onClick={onClose}>
-          &times;
-        </span>
+        <span className="cerrar-modal" onClick={onClose}>&times;</span>
         <h2>Selecciona tu mesa</h2>
+
         <div className="leyenda">
           <span className="mesa-disponible">Disponible</span>
           <span className="mesa-ocupada">Ocupada</span>
           <span className="mesa-seleccionada">Seleccionada</span>
         </div>
+
         <div className="plano">
           <div className="plano-mesas">
             {mesas.map((mesa) => {
-              const estado = obtenerEstadoMesa(mesa);
+              const estado = estadoMesa(mesa);
               const ocupada = estado === 'mesa-ocupada';
               return (
                 <div
@@ -124,8 +195,13 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
             })}
           </div>
         </div>
-        <button className="boton-reservar-final" onClick={confirmarReserva}>
-          Confirmar Reserva
+
+        <button
+          className="boton-reservar-final"
+          onClick={confirmarReserva}
+          disabled={guardando}
+        >
+          {guardando ? 'Guardando...' : 'Confirmar Reserva'}
         </button>
       </div>
     </div>
@@ -133,6 +209,7 @@ const ModalSeleccionMesa = ({ isOpen, onClose, onReservaCompleta }) => {
 };
 
 export default ModalSeleccionMesa;
+
 
 
 
