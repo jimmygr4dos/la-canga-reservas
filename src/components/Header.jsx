@@ -9,7 +9,7 @@ function Header({ onReservaClick }) {
         <a href="#">Brasas</a>
         <a href="#">Alitas y Parrillas</a>
         <a href="#">Combos</a>
-        <a href="#">Regionales</a>
+        <a href="#">Tradicionales</a>
         <a href="#">Guarniciones</a>
         <a href="#">Ensaladas</a>
         <a href="#">Bebidas</a>
